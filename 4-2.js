@@ -956,38 +956,43 @@ hgt:193cm iyr:2020 pid:719337690
 byr:1971
 ecl:brn eyr:2024`;
 
-// var input = `ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-// byr:1937 iyr:2017 cid:147 hgt:183cm
+const mustHaveKeys = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'];
 
-// iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-// hcl:#cfa07d byr:1929
+const validater = {
+  byr: (v) => v >= 1920 && v <= 2002,
+  iyr: (v) => v >= 2010 && v <= 2020,
+  eyr: (v) => v >= 2020 && v <= 2030,
+  hgt: (v) => {
+    // if (/cm|in/.test(v)) {
+    const num = v.replace(/\D/g, '');
+    if (/cm$/.test(v)) {
+      return num >= 150 && num <= 193;
+    } else if (/in$/.test(v)) {
+      return num >= 59 && num <= 76;
+    } else {
+      return false;
+    }
+  },
+  hcl: (v) => /^#[0-9A-F]{6}$/i.test(v),
+  ecl: (v) => /^(amb|blu|brn|gry|grn|hzl|oth)$/.test(v),
+  pid: (v) => /^\d{9}$/.test(v),
+  cid: () => {
+    return true;
+  },
+};
 
-// hcl:#ae17e1 iyr:2013
-// eyr:2024
-// ecl:brn pid:760753108 byr:1931
-// hgt:179cm
-
-// hcl:#cfa07d eyr:2025 pid:166559648
-// iyr:2011 ecl:brn hgt:59in`;
-
-// var input = `pid:087499704 hgt:59in ecl:grn iyr:2012 eyr:2030 byr:2002
-// hcl:#623a2f`;
-
-function one(input) {
-  const inputs = input.replace(/\n|\s/g, ",").split(",");
+function two(input) {
+  const inputs = input.replace(/\n|\s/g, ',').split(',');
+  //   console.log({ inputs });
 
   var all = [];
   var index = 0;
-  // var total = 0;
-
-  //   console.log(inputs.length);
 
   for (let i = 0; i < inputs.length; i++) {
-    if (inputs[i] === "") {
+    if (inputs[i] === '') {
       index++;
     } else {
-      const [key, value] = inputs[i].split(":");
-      //   console.log({ key, value });
+      const [key, value] = inputs[i].split(':');
       if (!all[index]) {
         all[index] = {};
         all[index][key] = value;
@@ -998,48 +1003,49 @@ function one(input) {
   }
 
   //   console.log({ all });
+  //   console.log(all.length);
 
-  all = all.filter((x) => {
-    // console.log(x);
-    const byr = x.byr && x.byr.length === 4 && x.byr >= 1920 && x.byr <= 2002;
+  const res = all.filter((x, i) => {
+    // console.log({ x });
+    const keys = Object.keys(x);
+    const values = Object.values(x);
 
-    const iyr = x.iyr && x.iyr.length === 4 && x.iyr >= 2010 && x.iyr <= 2020;
-
-    const eyr = x.eyr && x.eyr.length === 4 && x.eyr >= 2020 && x.eyr <= 2030;
-
-    var hgt = 0;
-    var hgt_num = "";
-
-    if (x.hgt) {
-      if (x.hgt.includes("cm") || x.hgt.includes("in")) {
-        hgt_num = x.hgt
-          .split("")
-          .filter((x) => Number.isInteger(x * 1))
-          .join("");
-
-        if (x.hgt.includes("cm")) {
-          hgt = hgt_num >= 150 && hgt_num <= 193;
-        }
-        if (x.hgt.includes("in")) {
-          hgt = hgt_num >= 59 && hgt_num <= 76;
-        }
-      }
-    }
-
-    const hcl = x.hcl && /^#[a-f0-9]{6}$/.test(x.hcl);
-
-    const ecl = x.ecl && /^(amb|blu|brn|gry|grn|hzl|oth)$/.test(x.ecl);
-
-    const pid = x.pid && !isNaN(x.pid) && x.pid.match(/^\d{9}/) !== null;
-
-    if (byr && iyr && eyr && hgt && hcl && ecl && pid) {
-      return x;
-    } else {
-      // console.log({ byr, iyr, eyr, hgt, hcl, ecl, pid });
+    // console.log({ keys, values });
+    if (
+      arraysEqual(keys, mustHaveKeys) ||
+      arraysEqual(keys, [...mustHaveKeys, 'cid'])
+    ) {
+      return keys.every((x, i) => {
+        // console.log({ x, i, value: values[i] });
+        // console.log(validater.byr("9999"));
+        // console.log(validater.byr("087499704"));
+        // console.log(validater[x](values[i]));
+        return validater[x](values[i]);
+      });
     }
   });
-  // console.log({ all });
-  console.log(all.length);
+
+  //   console.log({ res });
+  console.log(res.length);
 }
 
-one(input);
+two(input);
+
+function arraysEqual(a, b) {
+  a = a.slice().sort();
+  b = b.slice().sort();
+
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length !== b.length) return false;
+
+  // If you don't care about the order of the elements inside
+  // the array, you should sort both arrays here.
+  // Please note that calling sort on an array will modify that array.
+  // you might want to clone your array first.
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
