@@ -1,0 +1,26 @@
+{
+  "name": "adventofcode",
+  "version": "1.0.0",
+  "description": "aoc",
+  "main": "index.js",
+  "dependencies": {
+    "assert": "^2.0.0",
+    "jest": "^26.6.3",
+    "mocha": "^8.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/larrykkk/adventofcode.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/larrykkk/adventofcode/issues"
+  },
+  "homepage": "https://github.com/larrykkk/adventofcode#readme"
+}
